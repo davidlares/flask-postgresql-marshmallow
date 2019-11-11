@@ -2,6 +2,7 @@
 from . import db
 # action listener
 from sqlalchemy.event import listen
+from sqlalchemy import desc, asc
 
 # db.model inheritance
 class Task(db.Model):
@@ -19,6 +20,13 @@ class Task(db.Model):
     @classmethod
     def new(cls, title, description, deadline):
         return Task(title=title,description=description, deadline=deadline)
+
+    @classmethod
+    def get_by_page(cls, order, current, per_page=10):
+        # sorting rules
+        sort = desc(Task.id) if order == 'desc' else asc(Task.id)
+        # paginate object
+        return Task.query.paginate(current, per_page).items # we get the task list
 
     def save(self):
         try:

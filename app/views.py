@@ -10,7 +10,11 @@ api_v1 = Blueprint("api",__name__, url_prefix='/api/v1')
 
 @api_v1.route('/tasks', methods=['GET'])
 def get_tasks():
-    tasks = Task.query.all() # brings all tasks
+    # paginator
+    page = int(request.args.get('page', 1)) # default value 1
+    order = int(request.args.get('order', 'desc')) # sorting
+    tasks = Task.get_by_page(order,page)
+    # tasks = Task.query.all() # brings all tasks
     # using list comprenhensions for serialize each item
     return response([task.serialize() for task in tasks])
 
