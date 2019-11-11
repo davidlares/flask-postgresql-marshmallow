@@ -1,6 +1,8 @@
 from flask import Blueprint
+from flask import request
 from .responses import response
 from .responses import not_found
+from .responses import bad_request
 from .models.task import Task
 
 # endpoint handling
@@ -22,12 +24,49 @@ def get_task(id):
 
 @api_v1.route('/tasks', methods=['POST'])
 def create_task():
-    pass
+    # forcing JSON response
+    json = request.get_json(force=True)
+    if json.get('title') is None or len(json.get('title')) > 50:
+        return bad_request()
+
+    if json.get('description') is None:
+        return bad_request()
+
+    if json.get('deadline') is None:
+        return bad_request()
+
+    # adding new task
+    task = Task.new(json['title'], json['description'], json['deadline'])
+    # return boolean from instance class method save
+    if task.save():
+        return response(task.serialize())
+
+    return bad_request()
 
 @api_v1.route('/tasks/<id>', methods=['PUT'])
-def update_task():
-    pass
+def update_task(id):
+    task = Task.query.filter_by(id=id).first()
+    if task is None:
+        return not_found()
+
+    json = request.get_json(force=True)
+    task.title = json.get('title', task.title)
+    task.description = json.get('description', task.description)
+    task.deadline = json.get('deadline', task.deadline)
+
+    if task.save():
+        return response(task.serialize())
+    else:
+        return bad_request()
 
 @api_v1.route('/tasks/<id>', methods=['DELETE'])
-def delete_task():
-    pass
+def delete_task(id):
+    task = Task.query.filter_by(id=id).first()
+    if task is None:
+        return not_found()
+
+    if task.delete():
+        # is deleted (but persistest for the response)
+        return response(task.serialize())
+    else:
+        return bad_request()

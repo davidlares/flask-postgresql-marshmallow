@@ -15,6 +15,27 @@ class Task(db.Model):
     deadline = db.Column(db.DateTime(), nullable=False)
     created_at = db.Column(db.DateTime(), nullable=False, default=db.func.current_timestamp())
 
+    # add new task (class method)
+    @classmethod
+    def new(cls, title, description, deadline):
+        return Task(title=title,description=description, deadline=deadline)
+
+    def save(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return True
+        except Exception as e:
+            return False
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except Exception as e:
+            return False
+
     def __str__(self):
         return self.title
 
@@ -24,7 +45,7 @@ class Task(db.Model):
 
 def insert_tasks(*args, **kwargs):
     db.session.add(Task(title="Title 1",description="Description 1", deadline='2020-01-01 12:00:00'))
-    db.session.add(Task(title="Title 2",description="Description 2", deadline='2020 -01-01 12:00:00'))
+    db.session.add(Task(title="Title 2",description="Description 2", deadline='2020-01-01 12:00:00'))
     # persist data
     db.session.commit()
 
