@@ -1,0 +1,5 @@
+from flask import jsonify
+
+def response(data):
+    # formatting endpoint response
+    return jsonify({'success': True, 'data': data}, 200)
