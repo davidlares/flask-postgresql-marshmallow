@@ -1,5 +1,6 @@
 from flask import Blueprint
 from .responses import response
+from .responses import not_found
 from .models.task import Task
 
 # endpoint handling
@@ -12,8 +13,12 @@ def get_tasks():
     return response([task.serialize() for task in tasks])
 
 @api_v1.route('/tasks/<id>', methods=['GET'])
-def get_task():
-    pass
+def get_task(id):
+    # filtering by id
+    task = Task.query.filter_by(id=id).first()
+    if task is None:
+        return not_found()
+    return response(task.serialize())
 
 @api_v1.route('/tasks', methods=['POST'])
 def create_task():
