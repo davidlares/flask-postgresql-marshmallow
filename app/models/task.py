@@ -18,6 +18,10 @@ class Task(db.Model):
     def __str__(self):
         return self.title
 
+    def serialize(self):
+        # serializing results
+        return {'id': self.id, 'title': self.title, 'description': self.description, 'deadline': self.deadline}
+
 def insert_tasks(*args, **kwargs):
     db.session.add(Task(title="Title 1",description="Description 1", deadline='2020-01-01 12:00:00'))
     db.session.add(Task(title="Title 2",description="Description 2", deadline='2020 -01-01 12:00:00'))
