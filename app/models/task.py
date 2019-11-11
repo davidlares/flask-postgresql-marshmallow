@@ -1,5 +1,7 @@
 # ORM
 from . import db
+# action listener
+from sqlalchemy.event import listen
 
 # db.model inheritance
 class Task(db.Model):
@@ -15,3 +17,12 @@ class Task(db.Model):
 
     def __str__(self):
         return self.title
+
+def insert_tasks(*args, **kwargs):
+    db.session.add(Task(title="Title 1",description="Description 1", deadline='2020-01-01 12:00:00'))
+    db.session.add(Task(title="Title 2",description="Description 2", deadline='2020 -01-01 12:00:00'))
+    # persist data
+    db.session.commit()
+
+# this listener is for creating dummy data after table creation
+listen(Task.__table__, 'after_create', insert_tasks)
