@@ -3,3 +3,4 @@ app/*.pyc
 app/__pycache__
 app/models/*.pyc
 app/models/__pycache__
+__pycache__
