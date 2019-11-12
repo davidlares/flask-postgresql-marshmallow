@@ -1,4 +1,0 @@
-Creating record
-curl -i -H "Content-type: application/json" -X POST -d '{"title": "New task", "description": "New Description", "deadline": "2020-10-10 20:00"}' http://localhost:5000/api/v1/tasks
-Updating record
-curl -i -H "Content-type: application/json" -X PUT -d '{"title": "New updated task", "description": "New Description", "deadline": "2020-10-10 20:00"}' http://localhost:5000/api/v1/tasks/1

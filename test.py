@@ -1,9 +1,10 @@
 import unittest
 import json
 
-from app import create_app
-from config import config
 from app import db
+from app import create_app
+
+from config import config
 
 class TestAPI(unittest.TestCase):
     # starting tests
@@ -15,13 +16,12 @@ class TestAPI(unittest.TestCase):
         self.client = self.app.test_client()
         # in-out content_type
         self.content_type = 'application/json'
-        self.path = 'http://localhost:5000/api/v1/tasks'
+        self.path = 'http://127.0.0.1:5000/api/v1/tasks'
         self.path_first_task = self.path + '/1'
         self.path_fake_task = self.path + '/100'
         self.data = {'title': 'title','description': 'description','deadline': '2020-10-10 12:00:00'}
         self.updated_data = {'title': 'updated title'}
 
-    # after all
     def tearDown(self):
         with self.app.app_context():
             db.drop_all()
@@ -43,7 +43,8 @@ class TestAPI(unittest.TestCase):
         response = self.client.get(path=self.path_first_task,content_type=self.content_type)
         self.assertEqual(response.status_code, 200)
         # checking if data ID is the same as 1
-        self.assertEqual(self.get_task_id(response), 1)
+        task_id = self.get_task_id(response)
+        self.assertEqual(task_id, 1)
 
     # returning 404s intentionally
     def test_not_found(self):
@@ -52,16 +53,17 @@ class TestAPI(unittest.TestCase):
 
     # create test
     def test_create_task(self):
-        response = self.client.post(path=self.path, data=json.dumps(self.data), content_type=self.content_type)
+        response = self.client.post(path=self.path, data=json.dumps(self.data),content_type=self.content_type)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.get_task_id(response), 3)
+        task_id = self.get_task_id(response)
+        self.assertEqual(task_id, 3)
 
     def test_update_task(self):
         response = self.client.put(path=self.path_first_task, data=json.dumps(self.updated_data), content_type=self.content_type)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data.decode('utf-8'))
-        task_title = data['data']['title']
-        self.assertEqual(task_title, self.updated_data['title'])
+        title = data['data']['title']
+        self.assertEqual(title, self.updated_data['title'])
 
     def test_delete_task(self):
         response = self.client.delete(path=self.path_first_task, content_type=self.content_type)

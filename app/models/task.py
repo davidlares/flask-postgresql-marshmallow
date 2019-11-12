@@ -1,14 +1,13 @@
 # ORM
 from . import db
 # action listener
-from sqlalchemy.event import listen
 from sqlalchemy import desc, asc
+from sqlalchemy.event import listen
 
 # db.model inheritance
 class Task(db.Model):
 
     __tablename__ = 'tasks'
-
     # table columns description
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
@@ -22,18 +21,19 @@ class Task(db.Model):
         return Task(title=title,description=description, deadline=deadline)
 
     @classmethod
-    def get_by_page(cls, order, current, per_page=10):
+    def get_by_page(cls, order, page, per_page=10):
         # sorting rules
         sort = desc(Task.id) if order == 'desc' else asc(Task.id)
         # paginate object
-        return Task.query.paginate(current, per_page).items # we get the task list
+        return Task.query.order_by(sort).paginate(page, per_page).items # we get the task list
+
 
     def save(self):
         try:
             db.session.add(self)
             db.session.commit()
             return True
-        except Exception as e:
+        except:
             return False
 
     def delete(self):
@@ -41,15 +41,15 @@ class Task(db.Model):
             db.session.delete(self)
             db.session.commit()
             return True
-        except Exception as e:
+        except:
             return False
 
     def __str__(self):
         return self.title
 
-    def serialize(self):
-        # serializing results
-        return {'id': self.id, 'title': self.title, 'description': self.description, 'deadline': self.deadline}
+    # def serialize(self):
+    #     # serializing results
+    #     return {'id': self.id, 'title': self.title, 'description': self.description, 'deadline': self.deadline}
 
 def insert_tasks(*args, **kwargs):
     db.session.add(Task(title="Title 1",description="Description 1", deadline='2020-01-01 12:00:00'))

@@ -1,7 +1,9 @@
 # server module
 from flask import Flask
+
 from .models import db
 from .models.task import Task
+
 from .views import api_v1
 
 # instance
